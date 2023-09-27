@@ -239,13 +239,13 @@ app.delete('/doacao/:id_doacao', async (req, res) => {
 
 
 // configurações
-const getConfiguracoes = async () => {
+const getAllConfiguracoes = async () => {
     const [query] = await connection.execute('SELECT * FROM configuracoes');
     return query;
 }
 
 app.get('/configuracoes', async (req, res) => {
-    const consulta = await getConfiguracoes();
+    const consulta = await getAllConfiguracoes();
     return res.status(200).json(consulta);
 })
 
@@ -256,34 +256,23 @@ app.get('/configuracoes/:nomeinstituicao', async (req, res) => {
     return res.status(200).json(query);
 })
 
+app.post('/configuracoes/busca/:nomeinstituicao', async (req,res)=>{
+    const {nomeinstituicao} = req.params;
+    const [query]= await connection.execute('select * from configuracoes where nomeinstituicao = ? , [nomeinstituicao]')
+    if(query.length === 0) return res.status(400).json({mensagem: 'Nao encontrado.'})
+    return res.status(200).json(query);
+})
 
 app.post('/configuracoes', async (req, res) => {
     const { nomeinstituicao, emailinstituicao, multas } = req.body;
-
-    try {
-    
-        const [verificacao] = await connection.execute('SELECT * FROM configuracoes WHERE nomeinstituicao = ?', [nomeinstituicao]);
-
-        if (verificacao.length > 0) {
-            return res.status(400).json({ mensagem: 'Configuração com a mesma chave primária já existe.' });
-        }
-
-        await connection.execute(
-            'INSERT INTO configuracoes (nomeinstituicao, emailinstituicao, multas) VALUES (?, ?, ?)',
-            [nomeinstituicao, emailinstituicao, multas]
-        );
-
-        return res.status(201).json({ mensagem: 'Configuração criada com sucesso.' });
-    } catch (error) {
-        console.error('Erro ao criar configuração:', error);
-        return res.status(500).json({ mensagem: 'Erro interno do servidor ao criar configuração.' });
-    }
+    const [query] =  await connection.execute('INSERT INTO configuracoes (nomeinstituicao, emailinstituicao, multas) VALUES (?, ?, ?)',
+            [nomeinstituicao, emailinstituicao, multas])
+    return res.status(200).json(query);   
 })
 
 
 app.put('/configuracoes', async (req, res) => {
     const { nomeinstituicao, emailinstituicao, multas } = req.body;
-
     const [query] = await connection.execute(
         'UPDATE configuracoes SET nomeinstituicao = ?, emailinstituicao = ?, multas = ?',
         [nomeinstituicao, emailinstituicao, multas]
@@ -293,25 +282,11 @@ app.put('/configuracoes', async (req, res) => {
 
 app.delete('/configuracoes/:nomeinstituicao', async (req, res) => {
     const { nomeinstituicao } = req.params;
-
-    try {
-       
-        const [verificacao] = await connection.execute('SELECT * FROM configuracoes WHERE nomeinstituicao = ?', [nomeinstituicao]);
-
-        if (verificacao.length === 0) {
-            return res.status(404).json({ mensagem: 'Configuração não encontrada.' });
-        }
-
-        
-        await connection.execute('DELETE FROM configuracoes WHERE nomeinstituicao = ?', [nomeinstituicao]);
-
-        return res.status(200).json({ mensagem: 'Configuração excluída com sucesso.' });
-    } catch (error) {
-        console.error('Erro ao excluir configuração:', error);
-        return res.status(500).json({ mensagem: 'Erro interno do servidor ao excluir configuração.' });
-    }
-})
-
+    const [query] = await connection.execute(
+        'DELETE FROM configuracoes WHERE nomeinstituicao = ?', 
+        [nomeinstituicao])
+    return res.send(query)
+});
 
 // campanha
 const getAllCampanhas = async () => {
@@ -324,6 +299,19 @@ app.get('/campanha', async (req, res) => {
     return res.status(200).json(consulta);
 })
 
+app.get('/campanha/:id_campanha', async (req,res)=>{
+    const {id_camapanha} = req.params;
+    const [query] = await connection.execute('select * from campanha where id_campanha = ?', [id_campanha]);
+    if(query.lenght === 0) return res.status(400).json({mensagem: 'Nao encontrado. '})
+    return res.status(200).json(query);
+})
+
+app.post('/campanha/busca/:id_campanha', async (req,res)=>{
+    const {id_campanha} = req.params;
+    const [query]= await connection.execute('select * from campanha where id_campanha = ?' , [id_campanha])
+    if(query.length === 0) return res.status(400).json({mensagem: 'Nao encontrado.'})
+    return res.status(200).json(query);
+})
 
 app.post('/campanha', async (req, res) => {
     const {
@@ -350,7 +338,6 @@ app.post('/campanha', async (req, res) => {
         texto5
     } = req.body;
 
-    // Inserir os dados como VARCHAR(250)
     const [query] = await connection.execute(
         'INSERT INTO campanha (id_usuario, titulocampanha, descricao, datainicio, datatermino, valormeta, imagem1, imagem2, imagem3, imagem4, imagem5, imagem6, imagem7, imagem8, background, logo, texto1, texto2, texto3, texto4, texto5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
@@ -379,6 +366,71 @@ app.post('/campanha', async (req, res) => {
     );
     return res.status(200).json(query);
 })
+
+app.put('/campanha/:id_campanha', async (req, res) => {
+    const { id_campanha } = req.params;
+    const {
+        id_usuario,
+        titulocampanha,
+        descricao,
+        datainicio,
+        datatermino,
+        valormeta,
+        imagem1,
+        imagem2,
+        imagem3,
+        imagem4,
+        imagem5,
+        imagem6,
+        imagem7,
+        imagem8,
+        background,
+        logo,
+        texto1,
+        texto2,
+        texto3,
+        texto4,
+        texto5
+    } = req.body;
+
+    const [query] = await connection.execute(
+        'UPDATE campanha SET id_usuario = ?, titulocampanha = ?, descricao = ?, datainicio = ?, datatermino = ?, valormeta = ?, imagem1 = ?, imagem2 = ?, imagem3 = ?, imagem4 = ?, imagem5 = ?, imagem6 = ?, imagem7 = ?, imagem8 = ?, background = ?, logo = ?, texto1 = ?, texto2 = ?, texto3 = ?, texto4 = ?, texto5 = ? WHERE id_campanha = ?',
+        [
+            id_usuario,
+            titulocampanha,
+            descricao,
+            datainicio,
+            datatermino,
+            valormeta,
+            imagem1,
+            imagem2,
+            imagem3,
+            imagem4,
+            imagem5,
+            imagem6,
+            imagem7,
+            imagem8,
+            background,
+            logo,
+            texto1,
+            texto2,
+            texto3,
+            texto4,
+            texto5,
+            id_campanha
+        ]
+    );
+    return res.status(200).json(query);
+});
+
+app.delete('/campanha/:id_campanha', async (req, res) => {
+    const { id_campanha } = req.params;
+    const [query] = await connection.execute(
+        'DELETE FROM campanha WHERE id_campanha = ?',
+        [id_campanha]
+    );
+    return res.status(200).json(query);
+});
 
 
 
