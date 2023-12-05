@@ -57,19 +57,14 @@ const Home = () => {
   )
 };
 
-function ListarPessoas() {
-  const [doadores, setDoadores] = useState([]);
+function ListarDoadores() {
+  const [doadores, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const resposta = await axios.get('http://localhost:3333/doacao'); // Modifique a rota para apropriada, deve ser algo como 'http://localhost:3333/doador'
-        setDoadores(resposta.data);
-      } catch (error) {
-        console.error('Erro ao obter dados da API:', error);
-      }
+        const resposta = await axios.get('http://localhost:3000/doador'); // Modifique a rota para apropriada, deve ser algo como 'http://localhost:3333/doador'
+        setData(resposta.data);
     };
-
     fetchData();
   }, []);
 
@@ -112,7 +107,7 @@ const Listar = () => {
   return (
     <>
     <h1>Listar</h1>
-<ListarPessoas></ListarPessoas>
+<ListarDoadores></ListarDoadores>
     </>
     
 )
@@ -121,7 +116,7 @@ const Listar = () => {
 
 
 
-const CadastrarPessoa = () => {
+const CadastrarDoador = () => {
   const [nome, setNome] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [cpf, setCpf] = useState('');
@@ -134,9 +129,19 @@ const CadastrarPessoa = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(nome);
+    console.log(nascimento);
+    console.log(cpf);
+    console.log(cep);
+    console.log(numerocasa);
+    console.log(uf);
+    console.log(cidade);
+    console.log(pais);
+
+
     try {
       // Envia os dados para a rota usando o método POST
-      await axios.post('http://localhost:3333/doacao', {
+      await axios.post('http://localhost:3000/doador', {
         nome,
         nascimento,
         cpf,
@@ -258,7 +263,7 @@ const Cadastrar = () => {
   return (
     <>
     <h1>Cadastrar</h1>;
-<CadastrarPessoa></CadastrarPessoa>
+    <CadastrarDoador></CadastrarDoador>
     </>
     
 )
