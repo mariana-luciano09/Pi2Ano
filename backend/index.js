@@ -41,9 +41,6 @@ app.post('/doador', async (req, res) => {
     return res.status(200).json(query);
 })
 
-
-
-
 app.get('/doador/:iddoador', async (req, res) => {
     const { iddoador } = req.params;
     const [query] = await connection.execute('SELECT * FROM sistema.doador WHERE iddoador = ?', [iddoador]);
