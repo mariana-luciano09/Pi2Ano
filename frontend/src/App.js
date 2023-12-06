@@ -62,7 +62,8 @@ function ListarDoadores() {
 
   useEffect(() => {
     const fetchData = async () => {
-        const resposta = await axios.get('http://localhost:3000/doador'); // Modifique a rota para apropriada, deve ser algo como 'http://localhost:3333/doador'
+        const resposta = await axios.get('http://localhost:9000/doador'); // Modifique a rota para apropriada, deve ser algo como 'http://localhost:3333/doador'
+        console.log(resposta.data)
         setData(resposta.data);
     };
     fetchData();
@@ -75,8 +76,7 @@ function ListarDoadores() {
           <th style={{ padding: '8px', textAlign: 'left' }}>Nome</th>
           <th style={{ padding: '8px', textAlign: 'left' }}>Data de Nascimento</th>
           <th style={{ padding: '8px', textAlign: 'left' }}>CPF</th>
-          <th style={{ padding: '8px', textAlign: 'left' }}>CEP</th>
-          <th style={{ padding: '8px', textAlign: 'left' }}>Número da Casa</th>
+          <th style={{ padding: '8px', textAlign: 'left' }}>Valor</th>
           <th style={{ padding: '8px', textAlign: 'left' }}>UF</th>
           <th style={{ padding: '8px', textAlign: 'left' }}>Cidade</th>
           <th style={{ padding: '8px', textAlign: 'left' }}>País</th>
@@ -86,10 +86,9 @@ function ListarDoadores() {
         {doadores.map((doador, index) => (
           <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
             <td style={{ padding: '8px' }}>{doador.nome}</td>
-            <td style={{ padding: '8px' }}>{doador.nascimento}</td>
+            <td style={{ padding: '8px' }}>{new Date(doador.nascimento).toLocaleDateString('pt-BR')}</td>
             <td style={{ padding: '8px' }}>{doador.cpf}</td>
-            <td style={{ padding: '8px' }}>{doador.cep}</td>
-            <td style={{ padding: '8px' }}>{doador.numerocasa}</td>
+            <td style={{ padding: '8px' }}>{doador.valor}</td>
             <td style={{ padding: '8px' }}>{doador.uf}</td>
             <td style={{ padding: '8px' }}>{doador.cidade}</td>
             <td style={{ padding: '8px' }}>{doador.pais}</td>
@@ -107,7 +106,7 @@ const Listar = () => {
   return (
     <>
     <h1>Listar</h1>
-<ListarDoadores></ListarDoadores>
+    <ListarDoadores></ListarDoadores>
     </>
     
 )
@@ -120,8 +119,7 @@ const CadastrarDoador = () => {
   const [nome, setNome] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [cpf, setCpf] = useState('');
-  const [cep, setCep] = useState('');
-  const [numerocasa, setNumerocasa] = useState('');
+  const [valor, setValor] = useState('');
   const [uf, setUf] = useState('');
   const [cidade, setCidade] = useState('');
   const [pais, setPais] = useState('');
@@ -129,35 +127,28 @@ const CadastrarDoador = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(nome);
-    console.log(nascimento);
-    console.log(cpf);
-    console.log(cep);
-    console.log(numerocasa);
-    console.log(uf);
-    console.log(cidade);
-    console.log(pais);
-
+    const data = { nome, nascimento, cpf, valor, uf, cidade, pais };
+    console.log(data);
 
     try {
       // Envia os dados para a rota usando o método POST
-      await axios.post('http://localhost:3000/doador', {
+      await axios.post('http://localhost:9000/doador', {
         nome,
         nascimento,
         cpf,
-        cep,
-        numerocasa,
+        valor,
         uf,
         cidade,
         pais
       });
+
       alert('Dados enviados com sucesso!');
+
       // Limpa os campos após o envio bem-sucedido
       setNome('');
       setNascimento('');
       setCpf('');
-      setCep('');
-      setNumerocasa('');
+      setValor('');
       setUf('');
       setCidade('');
       setPais('');
@@ -169,7 +160,7 @@ const CadastrarDoador = () => {
 
   return (
     <div>
-      <h2>Formulário de Doação</h2>
+      <h2>Formulário de Doações</h2>
       <form onSubmit={handleSubmit}>
         <label>
           Nome:
@@ -202,21 +193,11 @@ const CadastrarDoador = () => {
         </label>
         <br />
         <label>
-          CEP:
+          Valor:
           <input
             type="text"
-            value={cep}
-            onChange={(e) => setCep(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <label>
-          Número da Casa:
-          <input
-            type="text"
-            value={numerocasa}
-            onChange={(e) => setNumerocasa(e.target.value)}
+            value={valor}
+            onChange={(e) => setValor(e.target.value)}
             required
           />
         </label>
@@ -262,7 +243,7 @@ const Cadastrar = () => {
    
   return (
     <>
-    <h1>Cadastrar</h1>;
+    <h1>Cadastrar</h1>
     <CadastrarDoador></CadastrarDoador>
     </>
     
